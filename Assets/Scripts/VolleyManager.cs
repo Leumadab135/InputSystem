@@ -8,7 +8,7 @@ public class VolleyManager : MonoBehaviour
     private bool isSpiking = false;
     private float verticalVelocity = 0f;
     private Vector3 playerStartPosition;
-    private Vector3 ballStartPosition = new Vector3(-3.7f, 0.5f, -1.4f);
+    private Vector3 ballStartPosition = new Vector3(5.2f, 0.3f, -3.6f);
     private Vector3 vectorDirectionBallFloor;
     private Vector3 vectorDirectionBallMaximum;
     //Transform
@@ -131,14 +131,13 @@ public class VolleyManager : MonoBehaviour
         //Pushes the ball up so you can practice your spike
         if(Input.GetKeyDown(KeyCode.E))
         {
-            ballRigidbody.AddForce(vectorDirectionBallMaximum * 130);
+            ballRigidbody.AddForce(vectorDirectionBallMaximum * 135);
         }
 
         // Ejecutar métodos de salto, remate, carrera y reinicio de posición del balón
         Jump();
         Spike();
         ResetBallPosition();
-        print(spikeForce);
     }
 }
 

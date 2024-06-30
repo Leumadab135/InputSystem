@@ -6,6 +6,7 @@ TagManager:
   tags:
   - WallBounce
   - Floor
+  - Block
   layers:
   - Default
   - TransparentFX

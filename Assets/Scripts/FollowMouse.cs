@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class FollowMouseOnPlane : MonoBehaviour
 {
-    // Variables para almacenar el plano y la posición del mouse
-    public Transform planeTransform;
 
     // Update is called once per frame
     void Update()
@@ -16,7 +14,7 @@ public class FollowMouseOnPlane : MonoBehaviour
             RaycastHit hit;
 
             // Realizar un Raycast hacia el plano
-            if (Physics.Raycast(ray, out hit) && hit.collider.transform == planeTransform)
+            if (Physics.Raycast(ray, out hit))
             {
                 // Obtener la posición del punto de intersección en el plano
                 Vector3 targetPosition = hit.point;
