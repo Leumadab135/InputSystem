@@ -1,7 +1,7 @@
 
 using UnityEngine;
 
-public class VoleyInputs : MonoBehaviour
+public class VolleyManager : MonoBehaviour
 {
     // Private Attributes
     private bool isJumping = false;
@@ -11,7 +11,6 @@ public class VoleyInputs : MonoBehaviour
     private Vector3 ballStartPosition = new Vector3(-3.7f, 0.5f, -1.4f);
     private Vector3 vectorDirectionBallFloor;
     private Vector3 vectorDirectionBallMaximum;
-    private bool resetBallPosition = false;
     //Transform
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Transform ballTransform;
@@ -25,8 +24,10 @@ public class VoleyInputs : MonoBehaviour
     private float gravity = 9.81f;
     private float speedRotation = 450f;
     //Spike
-    private float spikeForce = 350f;
-
+    private float spikeForce;
+    //Sound
+    [SerializeField] private AudioSource spikeSound;
+    [SerializeField] private AudioSource harderSpikeSound;
     // Public Methods
     public void Spike()
     {
@@ -37,21 +38,33 @@ public class VoleyInputs : MonoBehaviour
         // Calcular la distancia entre el jugador y la pelota
         float _distance = Vector3.Distance(playerTransform.position, ballTransform.position);
 
-        // Verificar si la distancia es menor a 2 para rematar
         if (_distance < 2)
-        {
-            if (Input.GetButtonDown("Fire1") && !isSpiking)
+            spikeForce = 350f;
+        if (_distance < 1.5f)
+            spikeForce = 550f;
+
+        // Verificar si la distancia es menor a 2 para rematar
+        if (_distance < 2f)
             {
-                // Anular todas las velocidades de la pelota
-                ballRigidbody.velocity = Vector3.zero;
-                ballRigidbody.angularVelocity = Vector3.zero;
+                if (Input.GetButtonDown("Fire1") && !isSpiking)
+                {
+               
+                    //Spike Sound 
+                    if (spikeForce == 350)
+                        spikeSound.Play();
+                    if (spikeForce == 550)
+                        harderSpikeSound.Play();
 
-                // Mover la pelota al punto de contacto
-                ballRigidbody.AddForce(vectorDirectionBallFloor * spikeForce);
+                    // Anular todas las velocidades de la pelota
+                    ballRigidbody.velocity = Vector3.zero;
+                    ballRigidbody.angularVelocity = Vector3.zero;
 
-                isSpiking = true;
+                    // Mover la pelota al punto de contacto
+                    ballRigidbody.AddForce(vectorDirectionBallFloor * spikeForce);
+
+                    isSpiking = true;
+                }
             }
-        }
 
         // Resetear el estado del remate después de aplicar la fuerza
         if (isSpiking)
@@ -88,13 +101,10 @@ public class VoleyInputs : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.R))
         {
-            resetBallPosition = true;
             ballTransform.position = ballStartPosition;
-
             ballRigidbody.velocity = Vector3.zero;
             ballRigidbody.angularVelocity = Vector3.zero;
         }
-            resetBallPosition = false;
     }
 
     private void Start()
@@ -112,10 +122,6 @@ public class VoleyInputs : MonoBehaviour
 
     void Update()
     {
-        // Dibujar Rayos para depuración
-        Debug.DrawRay(playerTransform.position, Vector3.right * Input.GetAxis("Horizontal"));
-        Debug.DrawRay(playerTransform.position, Vector3.forward * Input.GetAxis("Vertical"));
-
         // Mover el jugador
         playerTransform.Translate(Vector3.right * Input.GetAxis("Horizontal") * Time.deltaTime * movementSpeed);
         playerTransform.Translate(Vector3.forward * Input.GetAxis("Vertical") * Time.deltaTime * movementSpeed);
@@ -132,6 +138,7 @@ public class VoleyInputs : MonoBehaviour
         Jump();
         Spike();
         ResetBallPosition();
+        print(spikeForce);
     }
 }
 
