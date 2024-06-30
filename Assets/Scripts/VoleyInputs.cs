@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class VoleyInputs : MonoBehaviour
@@ -9,61 +8,58 @@ public class VoleyInputs : MonoBehaviour
     private bool isSpiking = false;
     private float verticalVelocity = 0f;
     private Vector3 playerStartPosition;
-    private Vector3 ballStartPosition = new Vector3(-3.7f, 6.5f, -1.4f);
-    public bool resetBallPosition = false;
+    private Vector3 ballStartPosition = new Vector3(-3.7f, 0.5f, -1.4f);
+    private Vector3 vectorDirectionBallFloor;
+    private Vector3 vectorDirectionBallMaximum;
+    private bool resetBallPosition = false;
     //Transform
-    [SerializeField]
-    private Transform playerTransform;
-    [SerializeField]
-    private Transform ballTransform;
-    [SerializeField]
-    private Transform FContactPointTransform;
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform ballTransform;
+    [SerializeField] private Transform FloorContactPointTransform;
+    [SerializeField] private Transform maximumAltitudPractice;
+    //Rigidbody
+    [SerializeField] private Rigidbody ballRigidbody;
     //Movimiento    
     private float movementSpeed = 5f;
     private float jumpHeight = 5f;
     private float gravity = 9.81f;
-    private float speedRotation = 450;
+    private float speedRotation = 450f;
     //Spike
-    private float spikeForce = 10f;
+    private float spikeForce = 350f;
 
     // Public Methods
     public void Spike()
     {
+        //Ball start position
+        vectorDirectionBallFloor = FloorContactPointTransform.position - ballTransform.position;
+        vectorDirectionBallFloor.Normalize();
+
         // Calcular la distancia entre el jugador y la pelota
         float _distance = Vector3.Distance(playerTransform.position, ballTransform.position);
 
-        // Verificar si la distancia es menor a 2
+        // Verificar si la distancia es menor a 2 para rematar
         if (_distance < 2)
         {
-            // Ajustar fuerza de remate según la distancia
-            if (_distance < 1)
-            {
-                spikeForce = 50f;
-            }
-            else
-            {
-                spikeForce = 3f;
-            }
-
-            // Iniciar el remate si se presiona "Fire1"
             if (Input.GetButtonDown("Fire1") && !isSpiking)
             {
+                // Anular todas las velocidades de la pelota
+                ballRigidbody.velocity = Vector3.zero;
+                ballRigidbody.angularVelocity = Vector3.zero;
+
+                // Mover la pelota al punto de contacto
+                ballRigidbody.AddForce(vectorDirectionBallFloor * spikeForce);
+
                 isSpiking = true;
             }
         }
 
-        // Mover la pelota al punto de contacto
+        // Resetear el estado del remate después de aplicar la fuerza
         if (isSpiking)
         {
-            ballTransform.position = Vector3.Lerp(ballTransform.position, FContactPointTransform.position, spikeForce * Time.deltaTime);
-
-            // Verificar si la pelota ha llegado al punto objetivo
-            if (Vector3.Distance(ballTransform.position, FContactPointTransform.position) < 0.1f)
-            {
-                isSpiking = false; // Detener el movimiento
-            }
+            isSpiking = false;
         }
     }
+
 
     public void Jump()
     {
@@ -88,35 +84,30 @@ public class VoleyInputs : MonoBehaviour
             playerTransform.position += new Vector3(0, verticalVelocity * Time.deltaTime, 0);
         }
     }
-
-    public void Run()
-    {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            if (movementSpeed == 5)
-            {
-        movementSpeed = 15;
-            }
-            else if (movementSpeed == 15)
-            {
-                movementSpeed = 5;
-            }
-        }
-    }
-
     public void ResetBallPosition()
     {
         if(Input.GetKeyDown(KeyCode.R))
         {
             resetBallPosition = true;
             ballTransform.position = ballStartPosition;
-            resetBallPosition = false;
+
+            ballRigidbody.velocity = Vector3.zero;
+            ballRigidbody.angularVelocity = Vector3.zero;
         }
+            resetBallPosition = false;
     }
 
     private void Start()
     {
         playerStartPosition = playerTransform.position; // Guardar la posición inicial del jugador
+        ballStartPosition = ballTransform.position;
+
+        //Practice
+        vectorDirectionBallMaximum = maximumAltitudPractice.position - ballTransform.position;
+        vectorDirectionBallMaximum.Normalize();
+
+        print("Welcome to my volley game!!! Press E to raise the ball and SPIKE with click.");
+        print("If you want to do it again, just press R and have fun." );
     }
 
     void Update()
@@ -131,12 +122,15 @@ public class VoleyInputs : MonoBehaviour
 
         playerTransform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * Time.deltaTime * speedRotation);
 
-
+        //Pushes the ball up so you can practice your spike
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            ballRigidbody.AddForce(vectorDirectionBallMaximum * 130);
+        }
 
         // Ejecutar métodos de salto, remate, carrera y reinicio de posición del balón
         Jump();
         Spike();
-        Run();
         ResetBallPosition();
     }
 }
