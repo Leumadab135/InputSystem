@@ -1,30 +1,34 @@
 
+using System.Collections;
 using UnityEngine;
 
 public class VolleyManager : MonoBehaviour
 {
     // Private Attributes
-        private bool isSpiking = false;
-        private Vector3 ballStartPosition = new Vector3(5.2f, 1f, -3.6f);
-        private Vector3 vectorDirectionBallFloor;
-        private Vector3 vectorDirectionBallMaximum;
+    private bool isSpiking = false;
+    private Vector3 ballStartPosition = new Vector3(5.2f, 1f, -3.6f);
+    private Vector3 vectorDirectionBallFloor;
+    private Vector3 vectorDirectionBallMaximum;
+    public GameObject hitPrefab;
+    public GameObject hitHarderPrefab;
+    
+    public GameObject resetEfectPrefab;
+    //Transform
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform ballTransform;
+    [SerializeField] private Transform FloorContactPointTransform;
+    [SerializeField] private Transform maximumAltitudPractice;
 
-        //Transform
-        [SerializeField] private Transform playerTransform;
-        [SerializeField] private Transform ballTransform;
-        [SerializeField] private Transform FloorContactPointTransform;
-        [SerializeField] private Transform maximumAltitudPractice;
-    
-        //Rigidbody
-        [SerializeField] private Rigidbody ballRigidbody;
-    
-        //Spike
-        private float spikeForce;
-    
-        // Spike Sound
-        [SerializeField] private AudioSource spikeSound;
-        [SerializeField] private AudioSource harderSpikeSound;
-    
+    //Rigidbody
+    [SerializeField] private Rigidbody ballRigidbody;
+
+    //Spike
+    private float spikeForce;
+
+    // Spike Sound
+    [SerializeField] private AudioSource spikeSound;
+    [SerializeField] private AudioSource harderSpikeSound;
+
     //Methods
 
     private void Start()
@@ -42,7 +46,7 @@ public class VolleyManager : MonoBehaviour
     {
         //Pushes the ball up so you can practice your spike
         if (Input.GetKeyDown(KeyCode.E))
-        ballRigidbody.AddForce(vectorDirectionBallMaximum * 135);
+            ballRigidbody.AddForce(vectorDirectionBallMaximum * 135);
 
         Spike();
     }
@@ -50,7 +54,7 @@ public class VolleyManager : MonoBehaviour
     private void FixedUpdate()
     {
         if (Input.GetKeyUp(KeyCode.R))
-        ResetBallPosition();
+            ResetBallPosition();
     }
 
 
@@ -65,40 +69,48 @@ public class VolleyManager : MonoBehaviour
 
         if (_distance < 2)
             spikeForce = 350f;
-       
+
         if (_distance < 1.3f)
-            spikeForce = 550f;
+            spikeForce = 600f;
 
         if (_distance < 2f)
+        {
+            if (Input.GetButtonDown("Fire1") && !isSpiking)
             {
-                if (Input.GetButtonDown("Fire1") && !isSpiking)
+
+                //Spike Sound 
+                if (spikeForce == 350)
                 {
-               
-                    //Spike Sound 
-                    if (spikeForce == 350)
-                        spikeSound.Play();
-                    if (spikeForce == 550)
-                        harderSpikeSound.Play();
-
-                    ballRigidbody.velocity = Vector3.zero;
-                    ballRigidbody.angularVelocity = Vector3.zero;
-
-                    ballRigidbody.AddForce(vectorDirectionBallFloor * spikeForce);
-
-                    isSpiking = true;
+                    spikeSound.Play();
+                    Instantiate(hitPrefab, ballTransform.position, Quaternion.identity);
                 }
+                if (spikeForce == 600)
+                {
+                    harderSpikeSound.Play();
+                    Instantiate(hitHarderPrefab, ballTransform.position, Quaternion.identity);
+                }
+
+                ballRigidbody.velocity = Vector3.zero;
+                ballRigidbody.angularVelocity = Vector3.zero;
+
+                ballRigidbody.AddForce(vectorDirectionBallFloor * spikeForce);
+
+                isSpiking = true;
             }
+        }
 
         if (isSpiking)
-        isSpiking = false;
+            isSpiking = false;
     }
 
 
     public void ResetBallPosition()
     {
-         // Reset the ball position and stop all velocities
+        // Reset the ball position and stop all velocities
         ballRigidbody.velocity = Vector3.zero;
         ballRigidbody.angularVelocity = Vector3.zero;
-         ballTransform.position = ballStartPosition;
+        ballTransform.position = ballStartPosition;
+
+        Instantiate(resetEfectPrefab, ballTransform.position, Quaternion.identity);
     }
 }
