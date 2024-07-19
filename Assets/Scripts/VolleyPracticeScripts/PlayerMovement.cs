@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public AudioSource jumpEfectSound;
     private Vector3 playerStartPosition;
     //Movement
-    private float movementSpeed = 6f;
+    private float movementSpeed = 7f;
     private float speedRotation = 450f;
     //Jump
     private bool isJumping = false;

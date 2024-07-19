@@ -4,39 +4,35 @@ using UnityEngine;
 
 public class VolleyManager : MonoBehaviour
 {
-    // Private Attributes
-    private bool isSpiking = false;
-    private Vector3 ballStartPosition = new Vector3(5.2f, 1f, -3.6f);
-    private Vector3 vectorDirectionBallFloor;
+    //Attributes
+    private Vector3 ballStartPosition = new Vector3(-1.9f, 3f, -7.46f);
     private Vector3 vectorDirectionBallMaximum;
-    public GameObject hitPrefab;
-    public GameObject hitHarderPrefab;
-    
-    public GameObject resetEfectPrefab;
-    //Transform
-    [SerializeField] private Transform playerTransform;
-    [SerializeField] private Transform ballTransform;
-    [SerializeField] private Transform FloorContactPointTransform;
-    [SerializeField] private Transform maximumAltitudPractice;
-
-    //Rigidbody
-    [SerializeField] private Rigidbody ballRigidbody;
-
-    //Spike
+    private Vector3 vectorDirectionBallFloor;
+    private bool isSpiking = false;
     private float spikeForce;
 
-    // Spike Sound
+
+    [Header("Transform")]
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform ballTransform;
+    [SerializeField] private Transform maximumAltitudPractice;
+    [SerializeField] private Transform FloorContactPointTransform;
+
+    [Header("Rigidbody")]
+    [SerializeField] private Rigidbody ballRigidbody;
+
+    [Header("Audio Effects")]
     [SerializeField] private AudioSource spikeSound;
     [SerializeField] private AudioSource harderSpikeSound;
 
-    //Methods
+    [Header("Effects")]
+    public GameObject hitPrefab;
+    public GameObject hitHarderPrefab;
+    public GameObject resetEfectPrefab;
 
+    //Methods
     private void Start()
     {
-        //Practice
-        vectorDirectionBallMaximum = maximumAltitudPractice.position - ballTransform.position;
-        vectorDirectionBallMaximum.Normalize();
-
         print("Welcome to my volley game!!! Press E to raise the ball and SPIKE with click.");
         print("If you want to do it again, just press R and have fun.");
     }
@@ -44,9 +40,9 @@ public class VolleyManager : MonoBehaviour
 
     void Update()
     {
-        //Pushes the ball up so you can practice your spike
-        if (Input.GetKeyDown(KeyCode.E))
-            ballRigidbody.AddForce(vectorDirectionBallMaximum * 135);
+        //Practice
+        vectorDirectionBallMaximum = maximumAltitudPractice.position - ballTransform.position;
+        vectorDirectionBallMaximum.Normalize();
 
         Spike();
     }
@@ -55,12 +51,12 @@ public class VolleyManager : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.R))
             ResetBallPosition();
+        //if (Input.GetKeyDown(KeyCode.E))
+        //    RaiseBall();
     }
-
 
     public void Spike()
     {
-        //Ball start position
         vectorDirectionBallFloor = FloorContactPointTransform.position - ballTransform.position;
         vectorDirectionBallFloor.Normalize();
 
@@ -75,10 +71,15 @@ public class VolleyManager : MonoBehaviour
 
         if (_distance < 2f)
         {
-            if (Input.GetButtonDown("Fire1") && !isSpiking)
+            if (Input.GetMouseButtonDown(0) && !isSpiking)
             {
+                isSpiking = true;
 
-                //Spike Sound 
+                ballRigidbody.velocity = Vector3.zero;
+                ballRigidbody.angularVelocity = Vector3.zero;
+                ballRigidbody.AddForce(vectorDirectionBallFloor * spikeForce);
+
+                //Spike Sound and Efects 
                 if (spikeForce == 350)
                 {
                     spikeSound.Play();
@@ -89,20 +90,20 @@ public class VolleyManager : MonoBehaviour
                     harderSpikeSound.Play();
                     Instantiate(hitHarderPrefab, ballTransform.position, Quaternion.identity);
                 }
-
-                ballRigidbody.velocity = Vector3.zero;
-                ballRigidbody.angularVelocity = Vector3.zero;
-
-                ballRigidbody.AddForce(vectorDirectionBallFloor * spikeForce);
-
-                isSpiking = true;
             }
         }
 
         if (isSpiking)
             isSpiking = false;
     }
+    //public void RaiseBall()
+    //{
 
+    //    ballRigidbody.velocity = Vector3.zero;
+    //    ballRigidbody.angularVelocity = Vector3.zero;
+    //    ballRigidbody.AddForce(vectorDirectionBallMaximum * 120);
+
+    //}
 
     public void ResetBallPosition()
     {
