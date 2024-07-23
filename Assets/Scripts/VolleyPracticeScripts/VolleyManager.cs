@@ -11,7 +11,6 @@ public class VolleyManager : MonoBehaviour
     private bool isSpiking = false;
     private float spikeForce;
 
-
     [Header("Transform")]
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Transform ballTransform;
@@ -33,7 +32,8 @@ public class VolleyManager : MonoBehaviour
     //Methods
     private void Start()
     {
-        print("Welcome to my volley game!!! Press E to raise the ball and SPIKE with click.");
+        print("Welcome to my volley game!!! Press F to do a reception to the setter hands");
+        print("Press E (forward set) or Q (backward set) when the ball is close enough to the setter");
         print("If you want to do it again, just press R and have fun.");
     }
 
@@ -51,8 +51,6 @@ public class VolleyManager : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.R))
             ResetBallPosition();
-        //if (Input.GetKeyDown(KeyCode.E))
-        //    RaiseBall();
     }
 
     public void Spike()
@@ -96,14 +94,6 @@ public class VolleyManager : MonoBehaviour
         if (isSpiking)
             isSpiking = false;
     }
-    //public void RaiseBall()
-    //{
-
-    //    ballRigidbody.velocity = Vector3.zero;
-    //    ballRigidbody.angularVelocity = Vector3.zero;
-    //    ballRigidbody.AddForce(vectorDirectionBallMaximum * 120);
-
-    //}
 
     public void ResetBallPosition()
     {
